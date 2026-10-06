@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KI-Potenzial-Radar | Globalytics</title>
+<meta name="description" content="Finden Sie in wenigen Minuten heraus, wo in Ihrem Unternehmen ungenutztes KI-, Daten- und Automatisierungspotenzial steckt.">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   Design-Tokens
+   ========================================================================= */
+:root{
+  --bg:#ffffff;
+  --surface:#f5f5f7;
+  --line:#e3e3e8;
+  --line-strong:#c7c7cc;
+  --muted:#6e6e73;
+  --text:#1d1d1f;
+  --ink:#000000;
+  --lime:#c8f135;
+  --lime-tint:#f6fbe2;
+  --err:#c3261b;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --font:'Schibsted Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--font);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  font-feature-settings:"ss01";
+}
+button,input,textarea{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.app{min-height:100dvh;display:flex;flex-direction:column}
+
+/* =========================================================================
+   Kopfzeile + Fortschritt
+   ========================================================================= */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  padding:calc(14px + env(safe-area-inset-top,0px)) 20px 12px;
+  background:rgba(255,255,255,.88);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);
+}
+.topbar-inner{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.brand{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:1.0625rem;letter-spacing:-.015em;text-decoration:none}
+.brand svg{flex:none}
+.top-title{font-size:.875rem;font-weight:500;color:var(--muted);text-align:center;white-space:nowrap}
+.progress{max-width:1080px;margin:12px auto 0}
+.segs{display:grid;grid-template-columns:3fr 3fr 3fr 3fr 2fr;gap:4px}
+.seg{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.seg i{display:block;height:100%;width:0;background:var(--lime);transition:width .55s var(--ease)}
+.progress-meta{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:.8125rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress-meta b{font-weight:600;color:var(--text)}
+
+/* =========================================================================
+   Bühne + Übergänge
+   ========================================================================= */
+.stage{flex:1;width:100%;max-width:1080px;margin:0 auto;padding:clamp(28px,6vh,64px) 20px 40px}
+.screen{animation:enter .5s var(--ease) both}
+.screen.from-top{animation-name:enterBack}
+.screen.leaving{animation:leave .18s ease forwards}
+@keyframes enter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes enterBack{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes leave{to{opacity:0;transform:translateY(-8px)}}
+
+/* =========================================================================
+   Buttons
+   ========================================================================= */
+.btn{
+  appearance:none;border:0;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:50px;padding:0 26px;border-radius:999px;
+  font-weight:600;font-size:1rem;letter-spacing:-.005em;text-decoration:none;white-space:nowrap;
+  transition:background-color .2s,color .2s,transform .15s,opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#2a2a2d}
+.btn-primary:disabled{background:#d2d2d7;cursor:not-allowed;transform:none}
+.btn-lime{background:var(--lime);color:#000}
+.btn-lime:hover{background:#bde52a}
+.btn-ghost{background:transparent;color:var(--muted);padding:0 14px}
+.btn-ghost:hover{color:var(--text)}
+
+/* =========================================================================
+   Intro
+   ========================================================================= */
+.intro{display:grid;gap:40px;align-items:center;min-height:calc(100dvh - 260px)}
+@media (min-width:880px){.intro{grid-template-columns:1.08fr .92fr;gap:56px}}
+.intro-title{
+  margin:0;font-weight:700;letter-spacing:-.045em;line-height:.95;
+  font-size:clamp(2.6rem,9.5vw,5.4rem);
+}
+.intro-title:focus{outline:none}
+.intro-sub{margin:22px 0 0;font-size:clamp(1.125rem,2.4vw,1.3rem);line-height:1.45;max-width:34ch;color:var(--text)}
+.intro-meta{margin:16px 0 0;color:var(--muted);font-size:.975rem}
+.intro-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:34px}
+.intro-note{margin:28px 0 0;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.9375rem;max-width:40ch}
+.intro-radar{max-width:460px;width:100%;justify-self:center}
+
+/* =========================================================================
+   Radar (SVG)
+   ========================================================================= */
+.radar svg{display:block;width:100%;height:auto;overflow:visible}
+.r-ring{fill:none;stroke:var(--line);stroke-width:1}
+.r-ring.outer{stroke:var(--line-strong)}
+.r-axis{stroke:var(--line);stroke-width:1}
+.r-label{font-family:var(--font);font-size:13px;font-weight:500;fill:var(--muted)}
+.r-val{font-weight:700;fill:var(--ink);font-variant-numeric:tabular-nums}
+.r-shape{fill:rgba(200,241,53,.6);stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.r-dot{fill:var(--ink);opacity:0;animation:fadeIn .4s ease .95s forwards}
+.r-center{fill:var(--ink)}
+.r-blip{fill:var(--lime);stroke:var(--ink);stroke-width:1;opacity:0;animation:blip 7s linear infinite}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes blip{0%{opacity:0}4%{opacity:1}30%{opacity:.85}45%,100%{opacity:0}}
+
+/* =========================================================================
+   Fragen
+   ========================================================================= */
+.q-wrap{max-width:720px;margin:0 auto}
+.q-title{
+  margin:0;font-weight:600;letter-spacing:-.028em;line-height:1.14;
+  font-size:clamp(1.6rem,4.4vw,2.45rem);hyphens:auto;-webkit-hyphens:auto;
+}
+.q-title:focus{outline:none}
+.q-help{margin:12px 0 0;color:var(--muted);font-size:1.0625rem;max-width:56ch}
+.q-body{margin-top:30px}
+
+.options{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:720px){.options.two{grid-template-columns:1fr 1fr}}
+.opt{
+  appearance:none;width:100%;text-align:left;cursor:pointer;
+  display:flex;align-items:center;gap:16px;min-height:66px;padding:16px 18px;
+  background:var(--bg);border:1px solid var(--line);border-radius:16px;
+  transition:border-color .2s,background-color .2s,box-shadow .25s,transform .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.opt:hover{border-color:var(--line-strong)}
+.opt:active{transform:scale(.988)}
+.opt-text{flex:1;min-width:0}
+.opt .t{display:block;font-weight:600;font-size:1.0625rem;letter-spacing:-.012em;line-height:1.3}
+.opt .s{display:block;margin-top:3px;color:var(--muted);font-size:.9rem;line-height:1.35}
+.mark{
+  flex:none;width:24px;height:24px;border-radius:50%;
+  border:1.5px solid var(--line-strong);display:grid;place-items:center;color:#000;
+  transition:background-color .2s,border-color .2s;
+}
+.opt[role="checkbox"] .mark{border-radius:7px}
+.mark svg{opacity:0;transform:scale(.4);transition:opacity .2s,transform .3s var(--ease)}
+.opt[aria-checked="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 .5px var(--ink);background:#fcfcfd}
+.opt[aria-checked="true"] .mark{background:var(--lime);border-color:var(--ink)}
+.opt[aria-checked="true"] .mark svg{opacity:1;transform:none}
+.opt.pulse{animation:pulse .6s var(--ease)}
+@keyframes pulse{0%{box-shadow:inset 0 0 0 .5px var(--ink),0 0 0 0 rgba(200,241,53,.9)}100%{box-shadow:inset 0 0 0 .5px var(--ink),0 0 0 9px rgba(200,241,53,0)}}
+
+.field textarea{
+  display:block;width:100%;min-height:150px;resize:vertical;
+  padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--surface);
+  font-size:1.0625rem;line-height:1.5;transition:border-color .2s,background-color .2s;
+}
+.field textarea::placeholder{color:#a1a1a6}
+.field textarea:focus{outline:none;border-color:var(--ink);background:var(--bg)}
+.chips-label{margin:18px 0 10px;font-size:.875rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--bg);
+  border-radius:999px;padding:8px 14px;font-size:.9rem;color:var(--text);
+  transition:border-color .2s,background-color .2s;
+}
+.chip:hover{border-color:var(--line-strong)}
+.chip.used{background:var(--surface);border-color:var(--surface);color:var(--muted)}
+
+.scale{padding:8px 0 4px}
+.scale-top{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;min-height:5.2rem}
+.scale-val{font-size:clamp(4rem,12vw,5.5rem);font-weight:700;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.scale-desc{font-size:1.0625rem;color:var(--text);max-width:30ch}
+.range{
+  -webkit-appearance:none;appearance:none;width:100%;height:36px;margin:26px 0 6px;background:transparent;cursor:pointer;
+  --p:50%;
+}
+.range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(to right,var(--lime) var(--p),var(--line) var(--p))}
+.range::-moz-range-track{height:6px;border-radius:3px;background:var(--line)}
+.range::-moz-range-progress{height:6px;border-radius:3px;background:var(--lime)}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;margin-top:-12px;border-radius:50%;background:var(--ink);border:4px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ink);border:4px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.range:focus-visible{outline:none}
+.range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--lime),0 1px 4px rgba(0,0,0,.25)}
+.scale-ends{display:flex;justify-content:space-between;color:var(--muted);font-size:.875rem}
+
+.hint{
+  display:none;margin-top:18px;padding:14px 16px 14px 18px;border-radius:12px;
+  background:var(--lime-tint);border-left:3px solid var(--lime);font-size:.975rem;line-height:1.45;
+}
+.hint.on{display:block;animation:enter .4s var(--ease) both}
+
+.q-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:30px}
+.q-actions-r{display:flex;align-items:center;gap:6px}
+.q-actions .btn-ghost{padding-left:0}
+.q-actions-r .btn-ghost{padding:0 14px}
+.kbd-note{display:none;margin-top:22px;font-size:.8125rem;color:#a1a1a6}
+@media (hover:hover) and (min-width:720px){.kbd-note{display:block}}
+@media (max-width:719px){
+  .q-actions{
+    position:sticky;bottom:0;margin-left:-20px;margin-right:-20px;
+    padding:22px 20px calc(14px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 34%);
+  }
+}
+
+/* =========================================================================
+   E-Mail-Gate
+   ========================================================================= */
+.gate{max-width:1000px;margin:0 auto;display:grid;gap:36px;align-items:center}
+@media (min-width:880px){.gate{grid-template-columns:1fr 1fr;gap:56px}}
+.gate h1{margin:0;font-size:clamp(2rem,5.5vw,3rem);font-weight:700;letter-spacing:-.035em;line-height:1.05}
+.gate h1:focus{outline:none}
+.gate-lead{margin:16px 0 0;font-size:1.125rem;max-width:40ch}
+.gate-form{margin-top:30px}
+.label{display:block;font-weight:600;font-size:.9375rem;margin-bottom:8px}
+.input{
+  display:block;width:100%;height:58px;padding:0 18px;border-radius:14px;
+  border:1px solid var(--line-strong);background:var(--bg);font-size:1.0625rem;
+  transition:border-color .2s,box-shadow .2s;
+}
+.input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(200,241,53,.55)}
+.input[aria-invalid="true"]{border-color:var(--err)}
+.err{min-height:1.4em;margin:8px 0 0;color:var(--err);font-size:.9rem}
+.check{display:flex;gap:12px;align-items:flex-start;margin-top:10px;cursor:pointer;font-size:.9375rem;line-height:1.4}
+.check input{position:absolute;opacity:0;pointer-events:none}
+.check .box{flex:none;width:22px;height:22px;margin-top:1px;border-radius:7px;border:1.5px solid var(--line-strong);display:grid;place-items:center;transition:background-color .2s,border-color .2s}
+.check .box svg{opacity:0;transition:opacity .15s}
+.check input:checked + .box{background:var(--lime);border-color:var(--ink)}
+.check input:checked + .box svg{opacity:1}
+.check input:focus-visible + .box{outline:2px solid var(--ink);outline-offset:2px}
+.gate-submit{margin-top:24px;width:100%}
+@media (min-width:560px){.gate-submit{width:auto}}
+.fine{margin:16px 0 0;color:var(--muted);font-size:.8125rem;line-height:1.5;max-width:52ch}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.gate-teaser{position:relative;max-width:440px;width:100%;justify-self:center}
+@media (max-width:879px){.gate-teaser{order:-1;max-width:280px;margin-bottom:-12px}}
+.gate-teaser .radar{filter:blur(7px);opacity:.75;transform:scale(.98)}
+.gate-teaser .lock{
+  position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+}
+.gate-teaser .lock span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-size:.9375rem;font-weight:600;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+.gate-back{margin-top:10px}
+
+/* =========================================================================
+   Ladezustand
+   ========================================================================= */
+.loading{max-width:420px;margin:8vh auto 0;text-align:center}
+.loading .radar{max-width:240px;margin:0 auto}
+.loading h1{margin:28px 0 0;font-size:1.5rem;letter-spacing:-.02em;font-weight:600}
+.loading h1:focus{outline:none}
+.steps{list-style:none;padding:0;margin:22px auto 0;display:inline-grid;gap:10px;text-align:left}
+.steps li{display:flex;align-items:center;gap:12px;color:#a1a1a6;transition:color .3s}
+.steps li .mark{width:20px;height:20px}
+.steps li.done{color:var(--text)}
+.steps li.done .mark{background:var(--lime);border-color:var(--ink)}
+.steps li.done .mark svg{opacity:1;transform:none}
+
+/* =========================================================================
+   Ergebnis
+   ========================================================================= */
+.result{max-width:960px;margin:0 auto}
+.res-head{display:grid;gap:24px;align-items:center}
+@media (min-width:820px){.res-head{grid-template-columns:1fr 1fr;gap:48px}}
+.res-title{margin:0;font-size:1.25rem;font-weight:600;letter-spacing:-.015em}
+.res-title:focus{outline:none}
+.score{display:flex;align-items:baseline;gap:10px;margin-top:10px}
+.score-num{font-size:clamp(5.5rem,20vw,9rem);font-weight:700;letter-spacing:-.06em;line-height:.85;font-variant-numeric:tabular-nums}
+.score-of{font-size:clamp(1.25rem,3vw,1.6rem);font-weight:600;color:var(--muted)}
+.verdict{margin:22px 0 0;font-size:1.3rem;font-weight:600;letter-spacing:-.018em;line-height:1.3}
+.verdict-sub{margin:8px 0 0;color:var(--muted);font-size:1.0625rem;max-width:42ch}
+.res-radar{max-width:440px;width:100%;justify-self:center}
+
+.res-sec{margin-top:clamp(56px,9vw,88px)}
+.res-sec h2{margin:0 0 22px;font-size:clamp(1.4rem,3.4vw,1.85rem);font-weight:700;letter-spacing:-.025em;line-height:1.15}
+.res-sec .sec-lead{margin:-12px 0 22px;color:var(--muted);max-width:56ch}
+
+.dims{display:grid;gap:16px}
+.dim{display:grid;grid-template-columns:minmax(0,1fr) 3.2ch;gap:8px 16px;align-items:center}
+@media (min-width:640px){.dim{grid-template-columns:240px minmax(0,1fr) 3.2ch}}
+.dim-name{font-weight:600;font-size:1rem;letter-spacing:-.01em}
+.dim-bar{grid-column:1/-1;height:8px;border-radius:4px;background:var(--surface);overflow:hidden;order:3}
+@media (min-width:640px){.dim-bar{grid-column:auto;order:0}}
+.dim-bar i{display:block;height:100%;width:0;border-radius:4px;background:var(--lime);box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);transition:width 1.1s var(--ease)}
+.dim-val{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.weights{margin:18px 0 0;color:var(--muted);font-size:.875rem}
+
+.pot{display:grid;grid-template-columns:auto 1fr;gap:4px 22px;padding:26px 0;border-top:1px solid var(--line)}
+.pot:last-child{border-bottom:1px solid var(--line)}
+.pot-rank{font-size:2rem;font-weight:700;letter-spacing:-.04em;line-height:1;color:#c7c7cc;font-variant-numeric:tabular-nums;padding-top:2px}
+.pot-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+.pot h3{margin:0;font-size:1.25rem;font-weight:600;letter-spacing:-.018em}
+.stars{font-size:1.05rem;letter-spacing:.12em;color:var(--ink);white-space:nowrap}
+.stars .off{color:#d2d2d7}
+.pot p{margin:8px 0 0;max-width:62ch}
+
+.levers{display:grid;gap:12px}
+@media (min-width:820px){.levers{grid-template-columns:repeat(3,1fr)}}
+.lever{background:var(--surface);border-radius:20px;padding:24px}
+.lever h3{margin:0;font-size:1rem;font-weight:600;color:var(--muted)}
+.lever-fig{margin:10px 0 0;font-size:1.5rem;font-weight:700;letter-spacing:-.025em;line-height:1.15}
+.lever-cap{margin:4px 0 0;font-size:.875rem;color:var(--muted)}
+.lever p.txt{margin:14px 0 0;font-size:.975rem}
+
+.own{display:grid;gap:12px}
+.own figure{margin:0;padding:20px 22px;border:1px solid var(--line);border-radius:18px}
+.own blockquote{margin:0;font-size:1.125rem;font-weight:500;letter-spacing:-.01em;line-height:1.4}
+.own figcaption{margin-top:8px;color:var(--muted);font-size:.875rem}
+
+.exec-body p{margin:0 0 14px;max-width:66ch}
+
+.cta{margin-top:clamp(56px,9vw,88px);background:var(--surface);border-radius:24px;padding:clamp(28px,5vw,48px)}
+.cta-pre{margin:0 0 22px;padding-bottom:22px;border-bottom:1px solid var(--line);color:var(--muted);font-size:1.0625rem;max-width:58ch}
+.cta h2{margin:0;font-size:clamp(1.4rem,3.4vw,1.9rem);font-weight:700;letter-spacing:-.025em;line-height:1.15;max-width:24ch}
+.cta p.cta-txt{margin:12px 0 26px;max-width:52ch}
+
+.res-tools{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:28px}
+.res-tools .btn-ghost{padding:0 14px 0 0;min-height:44px;font-weight:500;font-size:.9375rem}
+
+/* =========================================================================
+   Fußzeile
+   ========================================================================= */
+.foot{
+  max-width:1080px;width:100%;margin:0 auto;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-wrap:wrap;gap:8px 20px;color:#a1a1a6;font-size:.8125rem;
+}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--text)}
+.foot span{margin-right:auto}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .r-dot{opacity:1}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#" id="brandLink" aria-label="Globalytics – zum Start">
+        <svg width="18" height="18" viewBox="-10 -10 20 20" aria-hidden="true"><polygon points="0,-9 8.56,-2.78 5.29,7.28 -5.29,7.28 -8.56,-2.78" fill="#c8f135" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        Globalytics
+      </a>
+      <div class="top-title" id="topTitle"></div>
+      <div></div>
+    </div>
+    <div class="progress" id="progress" hidden>
+      <div class="segs" aria-hidden="true">
+        <div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div>
+      </div>
+      <div class="progress-meta"><span id="progCount"></span><b id="progSection"></b></div>
+    </div>
+  </header>
+
+  <main class="stage" id="stage" aria-live="polite"></main>
+
+  <footer class="foot">
+    <span>© <span id="year"></span> Globalytics</span>
+    <a id="imprintLink" href="#">Impressum</a>
+    <a id="privacyLink" href="#">Datenschutz</a>
+  </footer>
+</div>
+
+<noscript><p style="padding:24px;font-family:sans-serif">Bitte aktivieren Sie JavaScript, um das KI-Potenzial-Radar zu nutzen.</p></noscript>
+
+<script>
+(() => {
+'use strict';
+
+/* =========================================================================
+   KONFIGURATION
+   ========================================================================= */
+const CONFIG = {
+  version: '1.0.0',
+
+  // [1] n8n-ANBINDUNG: Hier die Production-URL Ihres n8n-Webhook-Nodes eintragen,
+  //     z. B. 'https://n8n.globalytics.de/webhook/ki-potenzial-radar'.
+  //     Solange null, läuft die Anwendung im lokalen Demo-Modus (keine Übertragung).
+  endpoint: null,
+  timeoutMs: 15000,
+
+  ctaUrl: 'mailto:kontakt@globalytics.de?subject=KI-Potenzial-Radar%20%E2%80%93%20Potenzial%20konkretisieren', // anpassen, z. B. Buchungslink
+  privacyUrl: '#',   // Link zur Datenschutzerklärung (Pflicht für DSGVO-konforme Lead-Erfassung)
+  imprintUrl: '#',   // Link zum Impressum
+
+  blockFreemail: true,    // true = nur geschäftliche Adressen (gmail, gmx, web.de … werden abgelehnt)
+  showJsonExport: true,   // JSON-Download auf der Ergebnisseite (für Tests; in Produktion ggf. false)
+  storageKey: 'glx-ki-potenzial-radar-v1'
+};
+
+const FREEMAIL = ['gmail.com','googlemail.com','gmx.de','gmx.net','gmx.at','gmx.ch','web.de','t-online.de','yahoo.com','yahoo.de',
+  'hotmail.com','hotmail.de','outlook.com','outlook.de','live.com','live.de','icloud.com','me.com','mac.com','aol.com','freenet.de',
+  'mail.de','posteo.de','proton.me','protonmail.com','arcor.de','online.de','bluewin.ch','gmx.com'];
+
+/* =========================================================================
+   INHALTE: Bereiche, Dimensionen, Fragen
+   ========================================================================= */
+const SECTIONS = [
+  { id:'A', name:'Prozesse' },
+  { id:'B', name:'Daten' },
+  { id:'C', name:'Kundenwachstum' },
+  { id:'D', name:'KI & Automatisierung' },
+  { id:'E', name:'Priorität' }
+];
+
+const DIMS = [
+  { key:'automation', name:'Prozessautomatisierung',       short:'Automatisierung', w:.22 },
+  { key:'data',       name:'Datennutzung',                 short:'Daten',           w:.18 },
+  { key:'ai',         name:'KI-Anwendungsfälle',           short:'KI',              w:.20 },
+  { key:'growth',     name:'Bestandskundenentwicklung',    short:'Wachstum',        w:.25 },
+  { key:'decision',   name:'Datenbasierte Entscheidungen', short:'Entscheidungen',  w:.15 }
+];
+
+const QUESTIONS = [
+  { id:'q1', section:'A', type:'single', layout:'two',
+    title:'Wo verliert Ihr Unternehmen heute am meisten Zeit durch manuelle Arbeit?',
+    help:'Wählen Sie den Bereich, der Ihnen zuerst einfällt.',
+    options:[
+      { v:'reporting',  t:'Reporting & Excel',               s:'Auswertungen, Listen, Monatsberichte',          auto:85 },
+      { v:'data_entry', t:'Dateneingabe & Datenübertragung', s:'Dieselben Daten in mehreren Systemen pflegen',  auto:88 },
+      { v:'docs',       t:'E-Mails & Dokumente',             s:'Lesen, prüfen, sortieren, weiterleiten',        auto:80, ai:true },
+      { v:'requests',   t:'Kundenanfragen',                  s:'Immer wieder ähnliche Fragen beantworten',      auto:78, ai:true },
+      { v:'quotes',     t:'Angebote & Aufträge',             s:'Angebote erstellen, Aufträge erfassen',         auto:82, ai:true },
+      { v:'admin',      t:'Interne Administration',          s:'Freigaben, Abstimmungen, Ablage',               auto:70 },
+      { v:'none',       t:'Kaum manuelle Arbeit',            s:'Unsere Abläufe sind weitgehend automatisiert',  auto:25 }
+    ]},
+
+  { id:'q2', section:'A', type:'text',
+    title:'Welche Aufgabe würde Ihr Team sofort abgeben, wenn sie zuverlässig automatisiert werden könnte?',
+    help:'Ein Satz genügt.',
+    placeholder:'z. B. Wochenreport aus drei Excel-Dateien zusammenführen',
+    examples:['Monatsreporting erstellen','Eingangsrechnungen erfassen','Angebote vorbereiten','Daten zwischen Systemen abgleichen']},
+
+  { id:'q3', section:'A', type:'single',
+    title:'Wie viele Stunden pro Monat fließen ungefähr in wiederkehrende manuelle Tätigkeiten?',
+    help:'Über das gesamte Team gerechnet. Eine grobe Schätzung reicht.',
+    options:[
+      { v:'lt10',    t:'Unter 10 Stunden',     auto:20, h:[0,10] },
+      { v:'10_25',   t:'10–25 Stunden',        auto:40, h:[10,25] },
+      { v:'25_50',   t:'25–50 Stunden',        auto:62, h:[25,50] },
+      { v:'50_100',  t:'50–100 Stunden',       auto:82, h:[50,100] },
+      { v:'gt100',   t:'Mehr als 100 Stunden', auto:95, h:[100,null] },
+      { v:'unknown', t:'Schwer einzuschätzen', auto:55, h:null }
+    ],
+    hint:(v, a) => ({
+      '25_50':  'Hochgerechnet sind das 300 bis 600 Arbeitsstunden pro Jahr.',
+      '50_100': a.q1 === 'reporting'
+                  ? 'Das entspricht potenziell 600 bis 1.200 Arbeitsstunden pro Jahr – allein für wiederkehrende Auswertungen.'
+                  : 'Das entspricht potenziell 600 bis 1.200 Arbeitsstunden pro Jahr.',
+      'gt100':  'Das sind mehr als 1.200 Arbeitsstunden pro Jahr – deutlich mehr als eine halbe Vollzeitstelle.',
+      'unknown':'Wenn sich der Aufwand schwer beziffern lässt, ist er oft über viele Schultern verteilt – und größer als gedacht.'
+    })[v] || null },
+
+  { id:'q4', section:'B', type:'multi', layout:'two',
+    title:'Welche Unternehmensdaten liegen bereits vor, werden aber heute nur teilweise genutzt?',
+    help:'Mehrfachauswahl möglich.',
+    options:[
+      { v:'crm',       t:'CRM',                    s:'Kontakte, Verkaufschancen, Historie' },
+      { v:'erp',       t:'ERP',                    s:'Aufträge, Bestände, Einkauf' },
+      { v:'sales',     t:'Verkaufsdaten',          s:'Umsätze nach Produkt, Region, Kunde' },
+      { v:'customers', t:'Kundendaten',            s:'Stammdaten, Verträge, Nutzung' },
+      { v:'service',   t:'Service- & Supportdaten',s:'Tickets, Reklamationen, Anfragen' },
+      { v:'finance',   t:'Finanzdaten',            s:'Buchhaltung, Controlling, Liquidität' },
+      { v:'email',     t:'E-Mails',                s:'Kommunikation mit Kunden und Partnern' },
+      { v:'docs',      t:'PDFs & Dokumente',       s:'Verträge, Rechnungen, Berichte' },
+      { v:'marketing', t:'Marketingdaten',         s:'Website, Kampagnen, Newsletter' },
+      { v:'other',     t:'Andere',                 s:'Weitere Systeme oder Quellen' }
+    ],
+    hint:(v) => {
+      const n = (v || []).length;
+      if (n >= 4) return `${n} Datenquellen mit ungenutztem Potenzial. Die Grundlage für bessere Auswertungen ist oft schon vorhanden.`;
+      if ((v || []).some(x => x === 'email' || x === 'docs')) return 'In E-Mails und Dokumenten steckt häufig Wissen, das heute kaum systematisch ausgewertet wird.';
+      return null;
+    }},
+
+  { id:'q5', section:'B', type:'text',
+    title:'Bei welchen Entscheidungen verlassen Sie sich heute noch stark auf Erfahrung oder Bauchgefühl?',
+    help:'Nennen Sie ein oder zwei Beispiele.',
+    placeholder:'z. B. Preisgestaltung, Personalplanung, Einkaufsmengen',
+    examples:['Preisgestaltung','Personal- und Kapazitätsplanung','Einkauf & Lagerbestände','Vertriebsprioritäten']},
+
+  { id:'q6', section:'B', type:'single',
+    title:'Wie schnell können Sie heute eine konkrete Frage zu Ihrem Unternehmen mit aktuellen Daten beantworten?',
+    help:'Zum Beispiel: „Welche Kunden haben in diesem Quartal weniger bestellt als im Vorjahr?“',
+    options:[
+      { v:'minutes', t:'Innerhalb weniger Minuten', score:20,
+        sentence:'Konkrete Fragen beantworten Sie bereits in wenigen Minuten – eine gute Grundlage, auf der sich aufbauen lässt.',
+        dsent:'Aktuelle Zahlen stehen Ihnen schnell zur Verfügung.' },
+      { v:'hour',    t:'Innerhalb einer Stunde',    score:38,
+        sentence:'Eine konkrete Frage mit aktuellen Daten zu beantworten, dauert bis zu einer Stunde.',
+        dsent:'Aktuelle Zahlen zu beschaffen, kostet bis zu einer Stunde.' },
+      { v:'day',     t:'Innerhalb eines Tages',     score:58,
+        sentence:'Eine konkrete Frage mit aktuellen Daten zu beantworten, dauert bis zu einem Tag.',
+        dsent:'Bis aktuelle Zahlen vorliegen, vergeht bis zu ein Tag.' },
+      { v:'days',    t:'Mehrere Tage',              score:80,
+        sentence:'Eine konkrete Frage mit aktuellen Daten zu beantworten, dauert mehrere Tage.',
+        dsent:'Bis aktuelle Zahlen vorliegen, vergehen mehrere Tage – viele Entscheidungen fallen vorher.' },
+      { v:'never',   t:'Häufig gar nicht',          score:92,
+        sentence:'Manche Fragen lassen sich mit aktuellen Daten häufig gar nicht beantworten.',
+        dsent:'Für manche Fragen gibt es heute keine belastbaren aktuellen Zahlen.' }
+    ],
+    hint:(v) => (v === 'days' || v === 'never') ? 'Wenn Antworten Tage dauern, werden viele Entscheidungen ohne sie getroffen.' : null },
+
+  { id:'q7', section:'C', type:'single',
+    title:'Wissen Sie bei Ihren Bestandskunden systematisch, welche weiteren Produkte oder Leistungen für sie relevant sein könnten?',
+    options:[
+      { v:'auto',   t:'Ja, automatisch',                 s:'Auf Basis von Daten und klaren Regeln', score:20 },
+      { v:'partly', t:'Ja, teilweise',                                                              score:48 },
+      { v:'sales',  t:'Hauptsächlich über den Vertrieb', s:'Das Wissen liegt bei einzelnen Personen', score:64 },
+      { v:'random', t:'Eher zufällig',                                                              score:85 },
+      { v:'no',     t:'Nein',                                                                       score:92 }
+    ],
+    hint:(v) => ({
+      sales: 'Wissen, das bei einzelnen Personen liegt, lässt sich schwer skalieren.',
+      random:'Hier könnte ungenutztes Umsatzpotenzial liegen.',
+      no:    'Hier könnte ungenutztes Umsatzpotenzial liegen.'
+    })[v] || null },
+
+  { id:'q8', section:'C', type:'single',
+    title:'Woran erkennen Sie heute, dass ein Bestandskunde bereit für ein weiteres Angebot sein könnte?',
+    options:[
+      { v:'data',      t:'Automatisch anhand von Daten', score:20, tail:'erkennen Sie bereits automatisch anhand von Daten.' },
+      { v:'crm',       t:'Über CRM und Vertrieb',        score:48, tail:'erkennen Sie vor allem über CRM und Vertrieb.' },
+      { v:'personal',  t:'In persönlichen Gesprächen',   score:62, tail:'erkennen Sie vor allem in persönlichen Gesprächen.' },
+      { v:'campaigns', t:'Über Kampagnen',               score:55, tail:'erkennen Sie vor allem über Kampagnen.' },
+      { v:'random',    t:'Eher zufällig',                score:85, tail:'zeigt sich heute eher zufällig.' },
+      { v:'none',      t:'Gar nicht',                    score:92, tail:'wird heute nicht systematisch erkannt.' }
+    ],
+    hint:(v) => (v === 'random' || v === 'none') ? 'Kaufbereitschaft zeigt sich häufig zuerst in Daten – lange bevor sie im Gespräch auftaucht.' : null },
+
+  { id:'q9', section:'C', type:'single',
+    title:'Welchen zusätzlichen Jahresumsatz halten Sie für möglich, wenn Sie nur einen kleinen Teil Ihrer Bestandskunden systematisch weiterentwickeln?',
+    help:'Denken Sie an etwa jeden zehnten Kunden.',
+    options:[
+      { v:'lt50',    t:'Unter 50.000 €',        inline:'unter 50.000 €',        score:45 },
+      { v:'50_100',  t:'50.000–100.000 €',      inline:'50.000–100.000 €',      score:60 },
+      { v:'100_250', t:'100.000–250.000 €',     inline:'100.000–250.000 €',     score:74 },
+      { v:'250_500', t:'250.000–500.000 €',     inline:'250.000–500.000 €',     score:86 },
+      { v:'gt500',   t:'Mehr als 500.000 €',    inline:'mehr als 500.000 €',    score:95 },
+      { v:'unknown', t:'Schwer einzuschätzen',  inline:null,                    score:58 }
+    ],
+    hint:(v) => ['100_250','250_500','gt500'].includes(v) ? 'Diese Größenordnung haben Sie selbst geschätzt. Sie fließt in Ihre Auswertung ein.' : null },
+
+  { id:'q10', section:'D', type:'text',
+    title:'Wenn Ihr Unternehmen morgen einen digitalen Assistenten hätte, der Ihre Unternehmensdaten kennt: Welche Aufgabe sollte er als Erstes übernehmen?',
+    placeholder:'z. B. Kundenanfragen mit Bezug auf Verträge und Lieferstatus vorbeantworten',
+    examples:['Kundenanfragen vorbeantworten','Verträge und Dokumente prüfen','Kennzahlen auf Zuruf liefern','Angebote entwerfen']},
+
+  { id:'q11', section:'D', type:'text',
+    title:'Welchen Prozess würden Sie als Erstes vollständig automatisieren, wenn Sie könnten?',
+    placeholder:'z. B. Auftragserfassung vom E-Mail-Eingang bis ins ERP',
+    examples:['Auftragserfassung','Rechnungsprüfung','Monatsabschluss-Reporting','Onboarding neuer Kunden']},
+
+  { id:'q12', section:'D', type:'scale',
+    title:'Wie stark könnte KI Ihr Unternehmen in den nächsten zwei bis drei Jahren verändern?',
+    help:'Ihre persönliche Einschätzung.',
+    min:0, max:10, start:5, minLabel:'kaum', maxLabel:'fundamental',
+    describe:(v) => v <= 2 ? 'Kaum spürbare Veränderung'
+                 : v <= 4 ? 'Punktuelle Veränderungen in einzelnen Abläufen'
+                 : v <= 6 ? 'Spürbare Veränderungen in mehreren Bereichen'
+                 : v <= 8 ? 'Deutliche Veränderung vieler Abläufe'
+                 :          'Grundlegende Veränderung des Geschäftsmodells' },
+
+  { id:'q13', section:'E', type:'single', layout:'two',
+    title:'Was wäre für Ihr Unternehmen aktuell der größte Hebel?',
+    options:[
+      { v:'cost',      t:'Kosten senken' },
+      { v:'time',      t:'Zeit sparen' },
+      { v:'staff',     t:'Mitarbeiter entlasten' },
+      { v:'revenue',   t:'Umsatz steigern' },
+      { v:'customers', t:'Bestandskunden entwickeln' },
+      { v:'decisions', t:'Bessere Entscheidungen treffen' },
+      { v:'scale',     t:'Prozesse skalierbar machen' }
+    ]},
+
+  { id:'q14', section:'E', type:'single',
+    title:'Wie hoch wäre Ihre Bereitschaft, einen identifizierten Daten- oder KI-Anwendungsfall tatsächlich umzusetzen?',
+    options:[
+      { v:'active', t:'Wir suchen bereits aktiv nach Lösungen' },
+      { v:'high',   t:'Sehr hoch' },
+      { v:'medium', t:'Mittel' },
+      { v:'info',   t:'Wir informieren uns zunächst' },
+      { v:'none',   t:'Aktuell kein Fokus' }
+    ]}
+];
+
+const Q = Object.fromEntries(QUESTIONS.map(q => [q.id, q]));
+
+/* =========================================================================
+   Hilfsfunktionen
+   ========================================================================= */
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const fmt = n => Number(n).toLocaleString('de-DE');
+const filled = t => typeof t === 'string' && t.trim().length >= 2;
+const opt = (qid, v) => (Q[qid].options || []).find(o => o.v === v) || null;
+const joinDe = arr => arr.length < 2 ? (arr[0] || '') : arr.slice(0, -1).join(', ') + ' und ' + arr[arr.length - 1];
+const NUM = ['null','ein','zwei','drei','vier','fünf','sechs'];
+const CHECK = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3.5 8.4l2.9 2.9 6-6.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const store = {
+  load()  { try { const r = localStorage.getItem(CONFIG.storageKey); return r ? JSON.parse(r) : null; } catch (e) { return null; } },
+  save(d) { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(d)); } catch (e) { /* Speicher nicht verfügbar – App läuft trotzdem */ } },
+  clear() { try { localStorage.removeItem(CONFIG.storageKey); } catch (e) {} }
+};
+
+/* =========================================================================
+   Zustand
+   ========================================================================= */
+const freshState = () => ({ step:-1, answers:{}, email:'', newsletter:false, startedAt:null, result:null, payload:null });
+let state = freshState();
+let timer = null;
+let busy = false;
+
+function persist() {
+  // Zwischenstand im Browser sichern (Antworten bleiben bei Reload erhalten)
+  store.save({ step: state.step, answers: state.answers, startedAt: state.startedAt });
+}
+
+/* =========================================================================
+   SCORING
+   Alle Werte 0–100. Höher = mehr ungenutztes Potenzial.
+   ========================================================================= */
+function computeScores(a) {
+  const q1 = opt('q1', a.q1), q3 = opt('q3', a.q3), q6 = opt('q6', a.q6);
+  const q7 = opt('q7', a.q7), q8 = opt('q8', a.q8), q9 = opt('q9', a.q9);
+  const srcs = Array.isArray(a.q4) ? a.q4 : [];
+  const slider = typeof a.q12 === 'number' ? a.q12 : 5;
+  const hasDocData = srcs.some(s => s === 'email' || s === 'docs');
+
+  // 1. Automatisierungspotenzial: Ort des Aufwands, Umfang, konkret benannte Aufgaben
+  let automation = .40 * (q1 ? q1.auto : 55) + .45 * (q3 ? q3.auto : 50)
+                 + (filled(a.q2) ? 8 : 0) + (filled(a.q11) ? 7 : 0);
+
+  // 2. Datenpotenzial: Anzahl ungenutzter Quellen + Geschwindigkeit des Datenzugriffs
+  const srcScore = srcs.length ? Math.min(95, 30 + srcs.length * 10) : 25;
+  let data = .55 * srcScore + .45 * (q6 ? q6.score : 55);
+
+  // 3. KI-Potenzial: erwartete Veränderung + Anzahl konkreter Anwendungsfälle
+  let ai = 20 + slider * 3.5
+         + [a.q2, a.q10, a.q11].filter(filled).length * 8
+         + (hasDocData ? 8 : 0) + (q1 && q1.ai ? 8 : 0);
+
+  // 4. Wachstumspotenzial: Systematik im Bestandskundengeschäft + eigene Umsatzschätzung
+  let growth = .35 * (q7 ? q7.score : 55) + .35 * (q8 ? q8.score : 55) + .30 * (q9 ? q9.score : 55);
+
+  // 5. Entscheidungspotenzial: je weniger datengetrieben heute, desto mehr Potenzial
+  let decision = .65 * (q6 ? q6.score : 55) + (filled(a.q5) ? 15 : 5) + (slider >= 7 ? 8 : 4);
+
+  const s = { automation, data, ai, growth, decision };
+
+  // Größter Hebel aus Sicht des Kunden verstärkt die passende Dimension leicht
+  const boost = { cost:'automation', time:'automation', staff:'ai', revenue:'growth',
+                  customers:'growth', decisions:'decision', scale:'automation' }[a.q13];
+  if (boost) s[boost] += 6;
+
+  for (const k in s) s[k] = Math.round(Math.min(98, Math.max(12, s[k])));
+  s.overall = Math.round(DIMS.reduce((t, d) => t + s[d.key] * d.w, 0));
+  return s;
+}
+
+const stars = score => score >= 85 ? 5 : score >= 70 ? 4 : score >= 55 ? 3 : score >= 40 ? 2 : 1;
+
+function hoursPerYear(v) {
+  const o = opt('q3', v);
+  if (!o || !o.h) return null;
+  return { min: o.h[0] * 12, max: o.h[1] == null ? null : o.h[1] * 12 };
+}
+function hoursText(h) {
+  if (!h) return null;
+  if (h.max == null) return `über ${fmt(h.min)} Stunden`;
+  if (h.min === 0)   return `bis zu ${fmt(h.max)} Stunden`;
+  return `${fmt(h.min)}–${fmt(h.max)} Stunden`;
+}
+
+function aiItems(a) {
+  const items = [];
+  if (filled(a.q10)) items.push('den digitalen Assistenten, den Sie beschrieben haben');
+  if (a.q1 === 'docs') items.push('die Bearbeitung von E-Mails und Dokumenten');
+  if (a.q1 === 'requests') items.push('wiederkehrende Kundenanfragen');
+  if (a.q1 === 'quotes') items.push('Angebots- und Auftragsprozesse');
+  if ((a.q4 || []).some(x => x === 'email' || x === 'docs') && a.q1 !== 'docs') items.push('Wissen aus E-Mails und PDF-Dokumenten');
+  if (filled(a.q11)) items.push('den Prozess, den Sie vollständig automatisieren würden');
+  return items;
+}
+
+/* Begründungen: erklären, WARUM ein Wert entstanden ist */
+const REASONS = {
+  automation(a) {
+    if (a.q1 === 'none') return 'Sie sehen in Ihrem Unternehmen wenig manuelle Arbeit. Potenzial liegt eher darin, bestehende Abläufe abzusichern und skalierbar zu machen.';
+    const q1 = opt('q1', a.q1), h = hoursPerYear(a.q3);
+    let s = q1 ? `Den größten manuellen Aufwand sehen Sie im Bereich ${q1.t}.` : 'Manuelle Routinearbeit ist in Ihren Antworten ein wiederkehrendes Thema.';
+    if (h) s += ` Hochgerechnet fließen ${hoursText(h)} pro Jahr in wiederkehrende Tätigkeiten.`;
+    else if (a.q3 === 'unknown') s += ' Den genauen Umfang können Sie schwer beziffern – oft ein Zeichen dafür, dass der Aufwand über viele Schultern verteilt ist.';
+    if (filled(a.q2)) s += ' Eine Aufgabe, die Ihr Team sofort abgeben würde, haben Sie bereits konkret benannt.';
+    return s;
+  },
+  data(a) {
+    const n = (a.q4 || []).length, q6 = opt('q6', a.q6);
+    let s = n ? `${n === 1 ? 'Eine' : n} der zehn abgefragten Datenquellen ${n === 1 ? 'wird' : 'werden'} nach Ihrer Einschätzung nur teilweise genutzt.`
+              : 'Sie haben keine Datenquelle als ungenutzt markiert.';
+    if (q6) s += ' ' + q6.sentence;
+    return s;
+  },
+  ai(a) {
+    const items = aiItems(a), k = items.length;
+    let s;
+    if (k === 0) s = 'Konkrete KI-Ansatzpunkte haben Sie bisher kaum benannt.';
+    else if (k === 1) s = `Aus Ihren Antworten ergibt sich ein konkreter KI-Ansatzpunkt, nämlich für ${items[0]}.`;
+    else s = `Aus Ihren Antworten ergeben sich ${NUM[Math.min(k, 6)]} konkrete KI-Ansatzpunkte, etwa für ${joinDe(items.slice(0, 2))}.`;
+    if (typeof a.q12 === 'number') s += ` Die Veränderung durch KI in den nächsten Jahren schätzen Sie auf ${a.q12} von 10.`;
+    return s;
+  },
+  growth(a) {
+    const q8 = opt('q8', a.q8), q9 = opt('q9', a.q9);
+    let s = q8 ? `Ob ein Bestandskunde bereit für ein weiteres Angebot ist, ${q8.tail}` : '';
+    if (q9) s += (s ? ' ' : '') + (q9.inline
+      ? `Ihr zusätzliches Umsatzpotenzial schätzen Sie selbst auf ${q9.inline} pro Jahr.`
+      : 'Das zusätzliche Umsatzpotenzial können Sie noch schwer beziffern.');
+    if (a.q7 === 'sales') s += ' Das Wissen über weitere Bedarfe liegt heute vor allem beim Vertrieb.';
+    return s || 'Im Bestandskundengeschäft zeigen Ihre Antworten Ansatzpunkte für mehr Systematik.';
+  },
+  decision(a) {
+    const q6 = opt('q6', a.q6);
+    let s = filled(a.q5) ? 'Sie haben Entscheidungen benannt, die heute stark auf Erfahrung und Bauchgefühl beruhen.' : '';
+    if (q6) s += (s ? ' ' : '') + q6.dsent;
+    return s || 'Ihre Entscheidungswege lassen sich mit aktuellen Daten weiter absichern.';
+  }
+};
+
+function verdict(score) {
+  if (score >= 75) return ['Hohes, konkret greifbares Potenzial.', 'Ihre Antworten zeigen mehrere Stellen, an denen Daten und KI schnell wirtschaftlichen Nutzen stiften können.'];
+  if (score >= 60) return ['Deutliches Potenzial in mehreren Bereichen.', 'In einzelnen Bereichen gibt es klare Ansatzpunkte, die sich gezielt erschließen lassen.'];
+  if (score >= 45) return ['Gezieltes Potenzial in ausgewählten Bereichen.', 'Einige Abläufe sind gut aufgestellt. Der Hebel liegt in wenigen, klar abgegrenzten Anwendungsfällen.'];
+  return ['Solide Basis mit punktuellem Potenzial.', 'Viele Abläufe sind bereits gut aufgestellt. Potenzial liegt vor allem in einzelnen, gezielten Verbesserungen.'];
+}
+
+/* Strukturierte Use Cases für Backend / KI-Report (nicht 1:1 im Frontend angezeigt) */
+function buildOpportunities(sc, a) {
+  const ops = [];
+  const prio = s => s >= 75 ? 'hoch' : s >= 55 ? 'mittel' : 'niedrig';
+  const add = (id, area, title, evidence, solution_hint) =>
+    ops.push({ id, area, title, evidence, priority: prio(sc[area]), solution_hint });
+  const q1 = opt('q1', a.q1), srcs = a.q4 || [], slow = ['day','days','never'].includes(a.q6);
+
+  if (q1 && a.q1 !== 'none')
+    add('process_automation', 'automation', `Automatisierung im Bereich ${q1.t}`, REASONS.automation(a), 'Power Automate / n8n / Fabric Data Pipelines');
+  if (a.q1 === 'reporting' || slow)
+    add('automated_reporting', 'data', 'Automatisiertes Reporting mit aktuellen Daten', REASONS.data(a), 'Power BI / Microsoft Fabric');
+  if (a.q1 === 'docs' || srcs.includes('email') || srcs.includes('docs'))
+    add('document_ai', 'ai', 'KI-gestützte Verarbeitung von E-Mails und Dokumenten', 'E-Mails/Dokumente als Aufwandstreiber oder ungenutzte Datenquelle genannt.', 'Azure AI Document Intelligence / LLM-Agent');
+  if (a.q1 === 'requests')
+    add('request_assistant', 'ai', 'KI-Assistent für wiederkehrende Kundenanfragen', 'Kundenanfragen als größter manueller Aufwand genannt.', 'RAG-Assistent / LangGraph-Agent');
+  if (sc.growth >= 55)
+    add('next_best_offer', 'growth', 'Datenbasierte Signale für Cross- und Upselling', REASONS.growth(a), 'CRM-/ERP-Analyse, Kunden-Scoring, Power BI');
+  if (filled(a.q5))
+    add('decision_support', 'decision', `Datenbasis für: ${a.q5.trim()}`, 'Vom Nutzer als Bauchgefühl-Entscheidung genannt.', 'Power BI Dashboards / Forecasting');
+  if (filled(a.q2))
+    add('user_quick_win', 'automation', a.q2.trim(), 'Vom Nutzer genannt: Aufgabe, die das Team sofort abgeben würde.', 'Quick Win prüfen');
+  if (filled(a.q10))
+    add('user_ai_assistant', 'ai', a.q10.trim(), 'Vom Nutzer genannt: erste Aufgabe für einen KI-Assistenten.', 'LangGraph-Agent mit Unternehmensdaten');
+  if (filled(a.q11))
+    add('user_full_automation', 'automation', a.q11.trim(), 'Vom Nutzer genannt: erster vollständig zu automatisierender Prozess.', 'Prozessanalyse + End-to-End-Automatisierung');
+  return ops;
+}
+
+function leadPriority(v) {
+  return ({ active:'A', high:'A', medium:'B', info:'C', none:'C' })[v] || null;
+}
+
+/* =========================================================================
+   JSON-PAYLOAD für Backend / n8n / KI
+   ========================================================================= */
+function buildPayload() {
+  const sc = state.result, a = state.answers;
+  const answers = {};
+  QUESTIONS.forEach(q => {
+    const v = a[q.id];
+    let label = null;
+    if (q.type === 'single') label = opt(q.id, v)?.t ?? null;
+    else if (q.type === 'multi') label = (v || []).map(x => opt(q.id, x)?.t).filter(Boolean);
+    else if (q.type === 'text') label = filled(v) ? v.trim() : null;
+    else label = v ?? null;
+    answers[q.id] = {
+      section: SECTIONS.find(s => s.id === q.section).name,
+      question: q.title,
+      type: q.type,
+      value: v ?? null,
+      label
+    };
+  });
+  return {
+    meta: {
+      assessment: 'ki-potenzial-radar',
+      version: CONFIG.version,
+      started_at: state.startedAt,
+      submitted_at: new Date().toISOString(),
+      locale: 'de-DE',
+      page: location.href,
+      referrer: document.referrer || null
+    },
+    email: state.email,
+    newsletter_opt_in: state.newsletter,
+    automation_score: sc.automation,
+    data_score: sc.data,
+    ai_score: sc.ai,
+    growth_score: sc.growth,
+    decision_score: sc.decision,
+    overall_score: sc.overall,
+    lead: {
+      priority: leadPriority(a.q14),           // A = heiß, B = warm, C = kalt
+      readiness: opt('q14', a.q14)?.t ?? null,
+      main_lever: opt('q13', a.q13)?.t ?? null
+    },
+    estimates: {
+      manual_hours_per_year: hoursPerYear(a.q3),
+      revenue_potential_per_year: opt('q9', a.q9)?.t ?? null
+    },
+    answers,
+    identified_opportunities: buildOpportunities(sc, a)
+  };
+}
+
+/* =========================================================================
+   submitAssessment()
+   Sendet das vollständige JSON an Backend / n8n.
+
+   ---------------------------------------------------------------------------
+   [1] n8n ANBINDEN
+       - In n8n einen Webhook-Node anlegen (Methode POST, Response: "Using 'Respond to Webhook' Node").
+       - Production-URL oben in CONFIG.endpoint eintragen.
+       - Im Webhook-Node unter Options "Allowed Origins (CORS)" die Domain dieser Seite eintragen.
+       - Alternativ eigener Endpoint: POST /api/assessment mit identischem JSON.
+
+   [3] LEADS SPEICHERN (im Backend, nicht hier)
+       - Nach dem Webhook z. B. Google Sheets / Microsoft Lists / SQL / CRM-Node.
+       - Felder: email, newsletter_opt_in, overall_score, lead.priority, submitted_at.
+       - newsletter_opt_in nur bei true in Marketing-Listen übernehmen (Double-Opt-In!).
+
+   [2] KI-API ANBINDEN (im Backend, NIEMALS mit API-Key im Frontend)
+       - Payload an ein LLM (z. B. Claude über den n8n-Anthropic-Node oder Azure OpenAI) übergeben.
+       - Prompt: "Erstelle aus diesem JSON einen Executive Summary Report für die Geschäftsführung …"
+       - Liefert der Webhook { executive_summary: "…" } zurück, wird der Text automatisch
+         auf der Ergebnisseite angezeigt (siehe renderExecutiveSummary()).
+
+   [4] PDF-REPORT ERZEUGEN (im Backend)
+       - Executive Summary + Scores in ein HTML-Template einsetzen.
+       - HTML → PDF z. B. mit Gotenberg, Puppeteer oder einem PDF-Node in n8n.
+
+   [5] E-MAIL MIT AUSWERTUNG VERSENDEN (im Backend)
+       - PDF als Anhang per Microsoft Graph / Outlook-, Gmail- oder SMTP-Node an payload.email senden.
+       - Optional interne Benachrichtigung bei lead.priority === 'A'.
+   ---------------------------------------------------------------------------
+   ========================================================================= */
+async function submitAssessment(payload) {
+  if (!CONFIG.endpoint) {
+    console.info('[KI-Potenzial-Radar] Demo-Modus: kein Endpoint gesetzt. Payload:', payload);
+    return { ok: true, demo: true };
+  }
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), CONFIG.timeoutMs);
+  try {
+    const res = await fetch(CONFIG.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json().catch(() => ({}));
+    return { ok: true, ...data };
+  } catch (err) {
+    // Fehler blockieren das Ergebnis für den Nutzer nicht.
+    console.warn('[KI-Potenzial-Radar] Übertragung fehlgeschlagen:', err);
+    return { ok: false, error: String(err) };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function renderExecutiveSummary(text) {
+  const sec = $('#execSummary');
+  if (!sec || !text) return;
+  $('.exec-body', sec).innerHTML = String(text).split(/\n{2,}/).map(p => `<p>${esc(p.trim())}</p>`).join('');
+  sec.hidden = false;
+}
+
+/* =========================================================================
+   RADAR (SVG)
+   ========================================================================= */
+function radarSVG({ scores = null, values = false, animate = false, sweep = false, label = 'KI-Potenzial-Radar' } = {}) {
+  const P = (i, r) => { const ang = (-90 + i * 72) * Math.PI / 180; return [+(r * Math.cos(ang)).toFixed(2), +(r * Math.sin(ang)).toFixed(2)]; };
+  const poly = r => DIMS.map((_, i) => P(i, r).join(',')).join(' ');
+
+  const rings = [20, 40, 60, 80, 100].map(r => `<polygon class="r-ring${r === 100 ? ' outer' : ''}" points="${poly(r)}"/>`).join('');
+  const axes = DIMS.map((_, i) => { const [x, y] = P(i, 100); return `<line class="r-axis" x1="0" y1="0" x2="${x}" y2="${y}"/>`; }).join('');
+  const labels = DIMS.map((d, i) => {
+    const [x, y] = P(i, 116);
+    const anchor = Math.abs(x) < 1 ? 'middle' : (x > 0 ? 'start' : 'end');
+    const by = y < -60 ? y - (values ? 14 : 4) : y > 60 ? y + 12 : y + 4;
+    const val = values && scores ? `<tspan class="r-val" x="${x}" dy="16">${scores[d.key]}</tspan>` : '';
+    return `<text class="r-label" x="${x}" y="${by}" text-anchor="${anchor}">${d.short}${val}</text>`;
+  }).join('');
+
+  let shape = '';
+  if (scores) {
+    const pts = DIMS.map((d, i) => P(i, Math.max(4, scores[d.key])).join(',')).join(' ');
+    const zero = DIMS.map(() => '0,0').join(' ');
+    const anim = animate && !reduced
+      ? `<animate attributeName="points" begin="indefinite" dur="1.1s" fill="freeze" from="${zero}" to="${pts}" calcMode="spline" keyTimes="0;1" keySplines="0.2 0.8 0.2 1"/>`
+      : '';
+    const dots = DIMS.map((d, i) => { const [x, y] = P(i, Math.max(4, scores[d.key])); return `<circle class="r-dot" cx="${x}" cy="${y}" r="3.5"/>`; }).join('');
+    shape = `<polygon class="r-shape" points="${pts}">${anim}</polygon>${dots}`;
+  }
+
+  let sw = '';
+  if (sweep && !reduced) {
+    const [ex, ey] = P(0.7, 100); // Ende des Sektors
+    sw = `
+      <defs><clipPath id="swc"><polygon points="${poly(100)}"/></clipPath><linearGradient id="swg" gradientUnits="userSpaceOnUse" x1="0" y1="-100" x2="${ex}" y2="${ey}">
+        <stop offset="0" stop-color="#c8f135" stop-opacity="0"/><stop offset="1" stop-color="#c8f135" stop-opacity=".65"/>
+      </linearGradient></defs>
+      <g clip-path="url(#swc)"><g>
+        <path d="M0,0 L0,-100 A100,100 0 0,1 ${ex},${ey} Z" fill="url(#swg)"/>
+        <line x1="0" y1="0" x2="${ex}" y2="${ey}" stroke="#000" stroke-opacity=".35" stroke-width="1"/>
+        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="7s" repeatCount="indefinite" begin="indefinite"/>
+      </g></g>
+      ${[[1, 64, 1.1], [3, 46, 4.0], [4, 80, 5.6]].map(([i, r, d]) => { const [x, y] = P(i, r); return `<circle class="r-blip" cx="${x}" cy="${y}" r="4" style="animation-delay:${d}s"/>`; }).join('')}`;
+  }
+
+  return `<svg viewBox="-228 -146 456 286" role="img" aria-label="${esc(label)}">${rings}${axes}${sw}${shape}<circle class="r-center" r="2.5"/>${labels}</svg>`;
+}
+
+function startSvgAnimations(root) {
+  $$('animate, animateTransform', root).forEach(el => { try { el.beginElement(); } catch (e) {} });
+}
+
+/* =========================================================================
+   NAVIGATION & ÜBERGÄNGE
+   ========================================================================= */
+function setChrome(mode, idx) {
+  const prog = $('#progress'), title = $('#topTitle');
+  title.textContent = mode === 'intro' ? '' : mode === 'result' ? 'Ihr Ergebnis' : 'KI-Potenzial-Radar';
+  if (mode === 'question' || mode === 'gate') {
+    prog.hidden = false;
+    const upTo = mode === 'gate' ? QUESTIONS.length : idx;
+    const segs = $$('.seg i', prog);
+    SECTIONS.forEach((s, k) => {
+      const qs = QUESTIONS.map((q, i) => ({ q, i })).filter(o => o.q.section === s.id);
+      const done = qs.filter(o => o.i < upTo).length;
+      segs[k].style.width = (done / qs.length * 100) + '%';
+    });
+    $('#progCount').textContent = mode === 'gate' ? 'Alle Fragen beantwortet' : `Frage ${idx + 1} von ${QUESTIONS.length}`;
+    $('#progSection').textContent = mode === 'gate' ? 'Auswertung' : SECTIONS.find(s => s.id === QUESTIONS[idx].section).name;
+  } else {
+    prog.hidden = true;
+  }
+}
+
+function show(build, { dir = 'fwd', mode = 'intro', idx = 0 } = {}) {
+  clearTimeout(timer);
+  const stage = $('#stage');
+  const old = stage.firstElementChild;
+  const mount = () => {
+    const el = build();
+    el.classList.add('screen');
+    if (dir === 'back') el.classList.add('from-top');
+    stage.replaceChildren(el);
+    setChrome(mode, idx);
+    window.scrollTo(0, 0);
+    const f = el.querySelector('[data-focus]');
+    if (f) f.focus({ preventScroll: true });
+    if (typeof el._after === 'function') el._after();
+    busy = false;
+  };
+  busy = true;
+  if (old && !reduced) { old.classList.add('leaving'); setTimeout(mount, 180); }
+  else mount();
+}
+
+function goNext() {
+  if (busy) return;
+  clearTimeout(timer);
+  if (state.step < QUESTIONS.length - 1) {
+    state.step++;
+    persist();
+    show(() => buildQuestion(state.step), { mode:'question', idx: state.step });
+  } else {
+    state.step = QUESTIONS.length;
+    persist();
+    show(buildGate, { mode:'gate' });
+  }
+}
+
+function goBack() {
+  if (busy) return;
+  clearTimeout(timer);
+  if (state.step <= 0) {
+    state.step = -1;
+    show(buildIntro, { dir:'back', mode:'intro' });
+  } else {
+    state.step--;
+    persist();
+    show(() => buildQuestion(state.step), { dir:'back', mode:'question', idx: state.step });
+  }
+}
+
+function restart() {
+  store.clear();
+  state = freshState();
+  show(buildIntro, { dir:'back', mode:'intro' });
+}
+
+/* =========================================================================
+   SCREEN: Intro
+   ========================================================================= */
+function buildIntro() {
+  const draft = store.load();
+  const canResume = draft && draft.answers && Object.keys(draft.answers).length > 0 && draft.step >= 0;
+  const el = document.createElement('section');
+  el.className = 'intro';
+  el.innerHTML = `
+    <div class="intro-copy">
+      <h1 class="intro-title" tabindex="-1" data-focus>KI-Potenzial-Radar</h1>
+      <p class="intro-sub">Finden Sie in wenigen Minuten heraus, wo in Ihrem Unternehmen ungenutztes KI-, Daten- und Automatisierungspotenzial steckt.</p>
+      <p class="intro-meta">${QUESTIONS.length} Fragen, rund 5 Minuten, persönliche Auswertung im Anschluss.</p>
+      <div class="intro-actions">
+        ${canResume
+          ? `<button type="button" class="btn btn-lime" data-act="resume">Analyse fortsetzen</button>
+             <button type="button" class="btn btn-ghost" data-act="new">Neu beginnen</button>`
+          : `<button type="button" class="btn btn-lime" data-act="start">Analyse starten</button>`}
+      </div>
+      <p class="intro-note">Analysiert wird Ihr Unternehmen – nicht Ihre KI-Kenntnisse. Technisches Vorwissen ist nicht nötig.</p>
+    </div>
+    <div class="intro-radar radar" aria-hidden="true">${radarSVG({ sweep:true })}</div>`;
+
+  const begin = () => {
+    state = freshState();
+    store.clear();
+    state.startedAt = new Date().toISOString();
+    goNext();
+  };
+  const startBtn = $('[data-act=start]', el);
+  if (startBtn) startBtn.onclick = begin;
+  const newBtn = $('[data-act=new]', el);
+  if (newBtn) newBtn.onclick = begin;
+  const resumeBtn = $('[data-act=resume]', el);
+  if (resumeBtn) resumeBtn.onclick = () => {
+    state = freshState();
+    state.answers = draft.answers || {};
+    state.startedAt = draft.startedAt || new Date().toISOString();
+    if (draft.step >= QUESTIONS.length) { state.step = QUESTIONS.length; show(buildGate, { mode:'gate' }); }
+    else { state.step = Math.max(0, draft.step); show(() => buildQuestion(state.step), { mode:'question', idx: state.step }); }
+  };
+  el._after = () => startSvgAnimations(el);
+  return el;
+}
+
+/* =========================================================================
+   SCREEN: Frage
+   ========================================================================= */
+function buildQuestion(i) {
+  const q = QUESTIONS[i];
+  const el = document.createElement('section');
+  el.className = 'q-wrap';
+  el.innerHTML = `
+    <h1 class="q-title" id="qt-${q.id}" tabindex="-1" data-focus>${q.title}</h1>
+    ${q.help ? `<p class="q-help">${q.help}</p>` : ''}
+    <div class="q-body"></div>
+    <div class="hint" role="status" aria-live="polite"></div>
+    <div class="q-actions">
+      <button type="button" class="btn btn-ghost" data-act="back">Zurück</button>
+      <div class="q-actions-r">
+        ${q.type === 'text' ? '<button type="button" class="btn btn-ghost" data-act="skip">Überspringen</button>' : ''}
+        <button type="button" class="btn btn-primary" data-act="next">Weiter</button>
+      </div>
+    </div>
+    ${q.type === 'single' || q.type === 'multi' ? '<p class="kbd-note">Tipp: Antworten lassen sich auch mit den Zifferntasten wählen.</p>' : ''}`;
+
+  const body = $('.q-body', el), hintEl = $('.hint', el), next = $('[data-act=next]', el);
+  const setHint = txt => {
+    if (txt) {
+      const wasOn = hintEl.classList.contains('on');
+      hintEl.textContent = txt; hintEl.classList.add('on');
+      // Auf kleinen Bildschirmen den Hinweis sichtbar machen
+      if (!wasOn && window.innerWidth < 720) setTimeout(() => hintEl.scrollIntoView({ block:'center', behavior: reduced ? 'auto' : 'smooth' }), 60);
+    }
+    else { hintEl.classList.remove('on'); hintEl.textContent = ''; }
+  };
+  $('[data-act=back]', el).onclick = goBack;
+  next.onclick = goNext;
+  const skip = $('[data-act=skip]', el);
+  if (skip) skip.onclick = () => { state.answers[q.id] = ''; persist(); goNext(); };
+
+  /* --- Einfachauswahl: Klick = Auswahl + automatisch weiter --- */
+  if (q.type === 'single') {
+    const wrap = document.createElement('div');
+    wrap.className = 'options' + (q.layout === 'two' ? ' two' : '');
+    wrap.setAttribute('role', 'radiogroup');
+    wrap.setAttribute('aria-labelledby', `qt-${q.id}`);
+    q.options.forEach(o => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.setAttribute('role', 'radio');
+      b.setAttribute('aria-checked', String(state.answers[q.id] === o.v));
+      b.innerHTML = `<span class="opt-text"><span class="t">${o.t}</span>${o.s ? `<span class="s">${o.s}</span>` : ''}</span><span class="mark" aria-hidden="true">${CHECK}</span>`;
+      b.onclick = () => {
+        if (busy) return;
+        clearTimeout(timer);
+        state.answers[q.id] = o.v;
+        persist();
+        $$('.opt', wrap).forEach(x => x.setAttribute('aria-checked', String(x === b)));
+        b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse');
+        const h = q.hint ? q.hint(o.v, state.answers) : null;
+        setHint(h);
+        next.hidden = false;
+        // Mit Hinweis: Nutzer liest ihn und klickt "Weiter". Ohne Hinweis: automatisch weiter.
+        if (!h) timer = setTimeout(goNext, reduced ? 150 : 480);
+      };
+      wrap.appendChild(b);
+    });
+    body.appendChild(wrap);
+    const cur = state.answers[q.id];
+    next.hidden = cur == null;
+    if (cur != null && q.hint) setHint(q.hint(cur, state.answers));
+  }
+
+  /* --- Mehrfachauswahl --- */
+  if (q.type === 'multi') {
+    if (!Array.isArray(state.answers[q.id])) state.answers[q.id] = [];
+    const sel = state.answers[q.id];
+    const wrap = document.createElement('div');
+    wrap.className = 'options' + (q.layout === 'two' ? ' two' : '');
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-labelledby', `qt-${q.id}`);
+    const sync = () => {
+      next.disabled = sel.length === 0;
+      next.textContent = sel.length ? `Weiter (${sel.length} gewählt)` : 'Weiter';
+      setHint(q.hint ? q.hint(sel, state.answers) : null);
+    };
+    q.options.forEach(o => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.setAttribute('role', 'checkbox');
+      b.setAttribute('aria-checked', String(sel.includes(o.v)));
+      b.innerHTML = `<span class="opt-text"><span class="t">${o.t}</span>${o.s ? `<span class="s">${o.s}</span>` : ''}</span><span class="mark" aria-hidden="true">${CHECK}</span>`;
+      b.onclick = () => {
+        const k = sel.indexOf(o.v);
+        if (k >= 0) sel.splice(k, 1); else sel.push(o.v);
+        b.setAttribute('aria-checked', String(k < 0));
+        if (k < 0) { b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+        persist();
+        sync();
+      };
+      wrap.appendChild(b);
+    });
+    body.appendChild(wrap);
+    sync();
+  }
+
+  /* --- Freitext mit Beispiel-Chips --- */
+  if (q.type === 'text') {
+    const val = typeof state.answers[q.id] === 'string' ? state.answers[q.id] : '';
+    body.innerHTML = `
+      <div class="field">
+        <label class="sr-only" for="ta-${q.id}">${q.title}</label>
+        <textarea id="ta-${q.id}" maxlength="600" placeholder="${esc(q.placeholder || '')}">${esc(val)}</textarea>
+      </div>
+      ${q.examples ? `<p class="chips-label">Oder als Startpunkt übernehmen:</p>
+        <div class="chips">${q.examples.map(x => `<button type="button" class="chip">${esc(x)}</button>`).join('')}</div>` : ''}`;
+    const ta = $('textarea', body);
+    const sync = () => {
+      state.answers[q.id] = ta.value;
+      next.disabled = !filled(ta.value);
+      persist();
+      $$('.chip', body).forEach(c => c.classList.toggle('used', ta.value.includes(c.textContent)));
+    };
+    ta.addEventListener('input', sync);
+    $$('.chip', body).forEach(c => c.onclick = () => {
+      if (ta.value.includes(c.textContent)) return;
+      ta.value = ta.value.trim() ? ta.value.trim().replace(/[.;,]$/, '') + '; ' + c.textContent : c.textContent;
+      sync();
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    });
+    sync();
+  }
+
+  /* --- Skala 0–10 --- */
+  if (q.type === 'scale') {
+    const v0 = typeof state.answers[q.id] === 'number' ? state.answers[q.id] : q.start;
+    body.innerHTML = `
+      <div class="scale">
+        <div class="scale-top"><output class="scale-val" for="rg-${q.id}">${v0}</output><span class="scale-desc"></span></div>
+        <input class="range" id="rg-${q.id}" type="range" min="${q.min}" max="${q.max}" step="1" value="${v0}"
+               aria-labelledby="qt-${q.id}" aria-valuetext="">
+        <div class="scale-ends"><span>${q.min} = ${q.minLabel}</span><span>${q.max} = ${q.maxLabel}</span></div>
+      </div>`;
+    const rg = $('input', body), out = $('.scale-val', body), desc = $('.scale-desc', body);
+    const sync = () => {
+      const v = Number(rg.value);
+      out.textContent = v;
+      desc.textContent = q.describe(v);
+      rg.style.setProperty('--p', ((v - q.min) / (q.max - q.min) * 100) + '%');
+      rg.setAttribute('aria-valuetext', `${v} von ${q.max}: ${q.describe(v)}`);
+    };
+    rg.addEventListener('input', sync);
+    next.onclick = () => { state.answers[q.id] = Number(rg.value); persist(); goNext(); };
+    sync();
+  }
+
+  return el;
+}
+
+/* =========================================================================
+   SCREEN: E-Mail-Gate
+   ========================================================================= */
+function validateEmail(v) {
+  v = v.trim();
+  if (!v) return 'Bitte geben Sie Ihre E-Mail-Adresse ein.';
+  if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v) || v.length > 254) return 'Diese E-Mail-Adresse ist ungültig. Bitte prüfen Sie die Schreibweise.';
+  const dom = v.split('@')[1].toLowerCase();
+  if (CONFIG.blockFreemail && FREEMAIL.includes(dom)) return 'Bitte verwenden Sie Ihre geschäftliche E-Mail-Adresse.';
+  return null;
+}
+
+function buildGate() {
+  const sc = computeScores(state.answers);
+  const n = Math.max(1, DIMS.filter(d => sc[d.key] >= 55).length);
+  const found = n === 1 ? 'ein konkretes Potenzialfeld' : `${NUM[n]} konkrete Potenzialfelder`;
+  const el = document.createElement('section');
+  el.className = 'gate';
+  el.innerHTML = `
+    <div>
+      <h1 tabindex="-1" data-focus>Ihr Ergebnis ist bereit.</h1>
+      <p class="gate-lead">Wir haben auf Basis Ihrer Antworten ${found} für Ihr Unternehmen identifiziert. Geben Sie Ihre geschäftliche E-Mail-Adresse ein, um Ihre persönliche Auswertung zu erhalten.</p>
+      <form class="gate-form" novalidate>
+        <label class="label" for="email">Geschäftliche E-Mail-Adresse</label>
+        <input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email"
+               autocapitalize="off" spellcheck="false" placeholder="name@unternehmen.de" aria-describedby="emailErr" value="${esc(state.email)}">
+        <p class="err" id="emailErr" role="alert"></p>
+        <div class="hp" aria-hidden="true"><label>Website<input type="text" name="firma_website" tabindex="-1" autocomplete="off"></label></div>
+        <label class="check">
+          <input type="checkbox" name="newsletter" ${state.newsletter ? 'checked' : ''}>
+          <span class="box" aria-hidden="true">${CHECK}</span>
+          <span>Ich möchte gelegentlich relevante Insights von Globalytics erhalten. Freiwillig und jederzeit abbestellbar.</span>
+        </label>
+        <button type="submit" class="btn btn-lime gate-submit">Meine Auswertung anzeigen →</button>
+        <p class="fine">Ihre Auswertung erhalten Sie unabhängig vom Newsletter. Wir verwenden Ihre Angaben zur Erstellung der Auswertung und zur Kontaktaufnahme zu diesem Assessment. Details in unserer <a href="${esc(CONFIG.privacyUrl)}" target="_blank" rel="noopener">Datenschutzerklärung</a>.</p>
+      </form>
+      <button type="button" class="btn btn-ghost gate-back" data-act="back" style="padding-left:0">Zurück zu den Fragen</button>
+    </div>
+    <div class="gate-teaser" aria-hidden="true">
+      <div class="radar">${radarSVG({ scores: sc })}</div>
+      <div class="lock"><span>Ihre Auswertung</span></div>
+    </div>`;
+
+  const form = $('form', el), input = $('#email', el), err = $('#emailErr', el);
+  input.addEventListener('input', () => {
+    if (input.getAttribute('aria-invalid') === 'true') { input.removeAttribute('aria-invalid'); err.textContent = ''; }
+  });
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const msg = validateEmail(input.value);
+    if (msg) { err.textContent = msg; input.setAttribute('aria-invalid', 'true'); input.focus(); return; }
+    state.email = input.value.trim().toLowerCase();
+    state.newsletter = form.newsletter.checked;
+    state.result = computeScores(state.answers);
+    state.payload = buildPayload();
+    const isBot = !!form.firma_website.value; // Honeypot: Bots füllen das versteckte Feld aus
+    state.submission = isBot ? Promise.resolve({ ok:true, skipped:true }) : submitAssessment(state.payload);
+    show(buildLoading, { mode:'loading' });
+  });
+  $('[data-act=back]', el).onclick = goBack;
+  return el;
+}
+
+/* =========================================================================
+   SCREEN: Auswertung wird erstellt
+   ========================================================================= */
+function buildLoading() {
+  const el = document.createElement('section');
+  el.className = 'loading';
+  const steps = ['Antworten auswerten', 'Potenziale gewichten', 'Auswertung zusammenstellen'];
+  el.innerHTML = `
+    <div class="radar" aria-hidden="true">${radarSVG({ sweep:true })}</div>
+    <h1 tabindex="-1" data-focus>Ihre Auswertung wird erstellt</h1>
+    <ul class="steps">${steps.map(s => `<li><span class="mark" aria-hidden="true">${CHECK}</span>${s}</li>`).join('')}</ul>`;
+  el._after = () => {
+    startSvgAnimations(el);
+    const lis = $$('.steps li', el);
+    const t = reduced ? 120 : 550;
+    lis.forEach((li, k) => setTimeout(() => li.classList.add('done'), t * (k + 1)));
+    setTimeout(() => show(buildResult, { mode:'result' }), t * (lis.length + 1) + 150);
+  };
+  return el;
+}
+
+/* =========================================================================
+   SCREEN: Ergebnis
+   ========================================================================= */
+function buildResult() {
+  const sc = state.result, a = state.answers;
+  const ranked = [...DIMS].sort((x, y) => sc[y.key] - sc[x.key]);
+  const top3 = ranked.slice(0, 3);
+  const [vHead, vSub] = verdict(sc.overall);
+  const starStr = n => '★'.repeat(n) + `<span class="off">${'★'.repeat(5 - n)}</span>`;
+
+  // Hebel mit Kennzahl
+  const h = hoursPerYear(a.q3);
+  const q9 = opt('q9', a.q9);
+  const nSrc = (a.q4 || []).length;
+  const levers = [
+    { key:'automation', title:'Zeitpotenzial',
+      fig: h ? hoursText(h) : (a.q3 === 'unknown' ? 'Noch nicht beziffert' : '–'),
+      cap: h ? 'manuelle Arbeit pro Jahr, nach Ihrer Schätzung' : 'Umfang der manuellen Arbeit',
+      txt: sc.automation >= 55
+        ? 'Ihre Angaben deuten darauf hin, dass wiederkehrende manuelle Tätigkeiten einen relevanten Teil Ihrer Kapazität binden.'
+        : 'Routinearbeit bindet bei Ihnen vergleichsweise wenig Kapazität. Einzelne Abläufe lassen sich trotzdem gezielt entlasten.' },
+    { key:'growth', title:'Wachstumspotenzial',
+      fig: q9 && q9.inline ? q9.t : 'Noch nicht beziffert',
+      cap: 'zusätzlicher Jahresumsatz, nach Ihrer Schätzung',
+      txt: sc.growth >= 55
+        ? 'Ihre Antworten zeigen Hinweise auf ungenutztes Potenzial in der Entwicklung bestehender Kunden.'
+        : 'Bestandskunden werden bei Ihnen bereits strukturiert entwickelt. Daten können helfen, Signale noch früher zu erkennen.' },
+    { key:'data', title:'Datenpotenzial',
+      fig: `${nSrc} von 10 Quellen`,
+      cap: 'werden nur teilweise genutzt',
+      txt: sc.data >= 55
+        ? 'Ein Teil Ihrer bereits vorhandenen Daten könnte stärker für Entscheidungen und Automatisierung genutzt werden.'
+        : 'Ihre Daten sind bereits gut erschlossen. Der nächste Schritt liegt darin, sie für Automatisierung und Prognosen zu nutzen.' }
+  ].sort((x, y) => sc[y.key] - sc[x.key]);
+
+  // Vom Nutzer selbst genannte Ansatzpunkte
+  const own = [
+    ['q2',  'Würde Ihr Team sofort abgeben'],
+    ['q11', 'Würden Sie als Erstes vollständig automatisieren'],
+    ['q10', 'Erste Aufgabe für einen digitalen Assistenten'],
+    ['q5',  'Entscheidung, die heute auf Bauchgefühl beruht']
+  ].filter(([id]) => filled(a[id]));
+
+  const el = document.createElement('section');
+  el.className = 'result';
+  el.innerHTML = `
+    <header class="res-head">
+      <div>
+        <h1 class="res-title" tabindex="-1" data-focus>Ihr KI-Potenzial-Radar</h1>
+        <div class="score" aria-label="Gesamtwert ${sc.overall} von 100">
+          <span class="score-num" aria-hidden="true">${reduced ? sc.overall : 0}</span><span class="score-of" aria-hidden="true">/ 100</span>
+        </div>
+        <p class="verdict">${vHead}</p>
+        <p class="verdict-sub">${vSub}</p>
+      </div>
+      <div class="res-radar radar">${radarSVG({ scores: sc, values: true, animate: true, label: 'Radar mit Ihren fünf Potenzialwerten' })}</div>
+    </header>
+
+    <section class="res-sec" aria-labelledby="h-dims">
+      <h2 id="h-dims">So setzt sich Ihr Wert zusammen</h2>
+      <div class="dims">
+        ${DIMS.map(d => `
+          <div class="dim">
+            <div class="dim-name">${d.name}</div>
+            <div class="dim-bar" role="img" aria-label="${d.name}: ${sc[d.key]} von 100"><i data-w="${sc[d.key]}"></i></div>
+            <div class="dim-val">${sc[d.key]}</div>
+          </div>`).join('')}
+      </div>
+      <p class="weights">Höhere Werte bedeuten mehr ungenutztes Potenzial. Gewichtung im Gesamtwert: ${DIMS.slice().sort((x, y) => y.w - x.w).map(d => `${d.short} ${Math.round(d.w * 100)} %`).join(', ')}.</p>
+    </section>
+
+    <section class="res-sec" aria-labelledby="h-top">
+      <h2 id="h-top">Ihre größten Potenziale</h2>
+      ${top3.map((d, k) => `
+        <article class="pot">
+          <span class="pot-rank">0${k + 1}</span>
+          <div>
+            <div class="pot-head">
+              <h3>${d.name}</h3>
+              <span class="stars" role="img" aria-label="${stars(sc[d.key])} von 5 Sternen">${starStr(stars(sc[d.key]))}</span>
+            </div>
+            <p>${esc(REASONS[d.key](a))}</p>
+          </div>
+        </article>`).join('')}
+    </section>
+
+    <section class="res-sec" aria-labelledby="h-lev">
+      <h2 id="h-lev">Wo wahrscheinlich der größte Hebel liegt</h2>
+      <div class="levers">
+        ${levers.map(l => `
+          <div class="lever">
+            <h3>${l.title}</h3>
+            <p class="lever-fig">${esc(l.fig)}</p>
+            <p class="lever-cap">${l.cap}</p>
+            <p class="txt">${l.txt}</p>
+          </div>`).join('')}
+      </div>
+    </section>
+
+    ${own.length ? `
+    <section class="res-sec" aria-labelledby="h-own">
+      <h2 id="h-own">Ihre eigenen Ansatzpunkte</h2>
+      <p class="sec-lead">Diese Punkte haben Sie selbst genannt. Häufig sind sie der beste Startpunkt für einen ersten Anwendungsfall.</p>
+      <div class="own">
+        ${own.map(([id, cap]) => `<figure><blockquote>${esc(a[id].trim())}</blockquote><figcaption>${cap}</figcaption></figure>`).join('')}
+      </div>
+    </section>` : ''}
+
+    <!-- [2] KI-API: Hier erscheint der individuelle Executive Summary, sobald das Backend ihn liefert -->
+    <section class="res-sec" id="execSummary" aria-labelledby="h-exec" hidden>
+      <h2 id="h-exec">Executive Summary</h2>
+      <div class="exec-body"></div>
+    </section>
+
+    <section class="cta" aria-labelledby="h-cta">
+      <p class="cta-pre">Die entscheidende Frage ist nicht mehr, ob KI eingesetzt werden kann, sondern wo sie bei Ihnen den größten wirtschaftlichen Hebel erzeugt.</p>
+      <h2 id="h-cta">Sie möchten aus diesen Potenzialen konkrete Use Cases machen?</h2>
+      <p class="cta-txt">Globalytics entwickelt individuelle Daten-, Power-BI-, Automatisierungs- und KI-Lösungen für mittelständische Unternehmen.</p>
+      <a class="btn btn-lime" href="${esc(CONFIG.ctaUrl)}" data-act="cta">Potenzial konkretisieren →</a>
+    </section>
+
+    <div class="res-tools">
+      ${CONFIG.showJsonExport ? '<button type="button" class="btn btn-ghost" data-act="json">Antworten als JSON herunterladen</button>' : ''}
+      <button type="button" class="btn btn-ghost" data-act="restart">Assessment neu starten</button>
+    </div>`;
+
+  const jsonBtn = $('[data-act=json]', el);
+  if (jsonBtn) jsonBtn.onclick = downloadJSON;
+  $('[data-act=restart]', el).onclick = restart;
+
+  el._after = () => {
+    store.clear(); // Assessment abgeschlossen: Zwischenstand entfernen
+    startSvgAnimations(el);
+    // Balken wachsen lassen
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      $$('.dim-bar i', el).forEach(i => { i.style.width = i.dataset.w + '%'; });
+    }));
+    // Gesamtwert hochzählen
+    if (!reduced) {
+      const num = $('.score-num', el), target = sc.overall, t0 = performance.now(), dur = 1100;
+      const tick = now => {
+        const p = Math.min(1, (now - t0) / dur);
+        num.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+    // Antwort des Backends abwarten (z. B. Executive Summary aus n8n/KI)
+    if (state.submission) state.submission.then(r => {
+      if (r && r.executive_summary) renderExecutiveSummary(r.executive_summary);
+    });
+  };
+  return el;
+}
+
+/* =========================================================================
+   JSON-Export
+   ========================================================================= */
+function downloadJSON() {
+  const data = state.payload || buildPayload();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ki-potenzial-radar_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* =========================================================================
+   Tastatur: Ziffern wählen Antworten, Enter = Weiter
+   ========================================================================= */
+document.addEventListener('keydown', e => {
+  const wrap = $('#stage .q-wrap');
+  if (!wrap || e.altKey) return;
+  const ae = document.activeElement, tag = ae ? ae.tagName : '';
+  const next = $('[data-act=next]', wrap);
+  if (tag === 'TEXTAREA') {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && next && !next.disabled) { e.preventDefault(); next.click(); }
+    return;
+  }
+  if (tag === 'INPUT') {
+    if (e.key === 'Enter' && ae.type === 'range' && next) { e.preventDefault(); next.click(); }
+    return;
+  }
+  if (e.metaKey || e.ctrlKey) return;
+  if (/^[1-9]$/.test(e.key)) {
+    const o = $$('.opt', wrap)[Number(e.key) - 1];
+    if (o) { e.preventDefault(); o.click(); o.focus({ preventScroll:true }); }
+  } else if (e.key === 'Enter' && tag !== 'BUTTON' && tag !== 'A' && next && !next.hidden && !next.disabled) {
+    e.preventDefault(); next.click();
+  }
+});
+
+/* =========================================================================
+   Start
+   ========================================================================= */
+$('#year').textContent = new Date().getFullYear();
+$('#privacyLink').href = CONFIG.privacyUrl;
+$('#imprintLink').href = CONFIG.imprintUrl;
+$('#brandLink').addEventListener('click', e => {
+  e.preventDefault();
+  if (state.step >= 0 && state.step <= QUESTIONS.length && !state.result) {
+    persist(); // Zwischenstand bleibt, Intro bietet "Fortsetzen" an
+  }
+  state = freshState();
+  show(buildIntro, { dir:'back', mode:'intro' });
+});
+show(buildIntro, { mode:'intro' });
+
+})();
+</script>
+</body>
+</html>
